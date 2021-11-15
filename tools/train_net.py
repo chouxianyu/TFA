@@ -1,14 +1,18 @@
 """
+训练脚本
 Detection Training Script.
 
+该脚本读取1个给定的config，然后进行训练和评估。
 This scripts reads a given config file and runs the training or evaluation.
 It is an entry point that is made to train standard models in FsDet.
 
+为支持多种模型的训练，该脚本包含了特定于这些内置模型的logic，因此该脚本可能并不适用于你自己的project
 In order to let one script support training of many models,
 this script contains logic that are specific to these built-in models and
 therefore may not be suitable for your own project.
 For example, your research project perhaps only needs a single "evaluator".
 
+因此我们建议你把FsDet作为1个库并把该脚本作为1个如何使用该库的示例
 Therefore, we recommend you to use FsDet as an library and take
 this file as an example of how to use the library.
 You may want to write your own script with your datasets and other customizations.
@@ -16,11 +20,13 @@ You may want to write your own script with your datasets and other customization
 
 import os
 
+# import detectron2
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.data import MetadataCatalog
 from detectron2.engine import launch
 
+# import fsdet
 from fsdet.config import get_cfg, set_global_cfg
 from fsdet.engine import DefaultTrainer, default_argument_parser, default_setup
 from fsdet.evaluation import (
@@ -74,14 +80,27 @@ class Trainer(DefaultTrainer):
 def setup(args):
     """
     Create configs and perform basic setups.
+    创建config并进行基础的设置
     """
+    # 获取FsDet的默认config
     cfg = get_cfg()
+
+    # 和命令行中提供的config文件和config选项进行融合
     cfg.merge_from_file(args.config_file)
     if args.opts:
         cfg.merge_from_list(args.opts)
+    
+    # 使该config不可改变
     cfg.freeze()
+
+    # 将该config设为全局config（global_config），这样在任何地方都可以使用该config
     set_global_cfg(cfg)
+
+    # 1. 设置logger
+    # 2. 输出基本环境信息、命令行参数和config
+    # 3. 备份config到输出文件夹
     default_setup(cfg, args)
+
     return cfg
 
 
@@ -108,8 +127,10 @@ def main(args):
 
 
 if __name__ == "__main__":
+    # 获取命令行参数
     args = default_argument_parser().parse_args()
     print("Command Line Args:", args)
+    # 运行main函数
     launch(
         main,
         args.num_gpus,

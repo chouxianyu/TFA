@@ -7,7 +7,7 @@ FsDet contains the official few-shot object detection implementation of the ICML
 [Frustratingly Simple Few-Shot Object Detection](https://arxiv.org/abs/2003.06957).
 ![TFA Figure](https://user-images.githubusercontent.com/7898443/76520006-698cc200-6438-11ea-864f-fd30b3d50cea.png)
 
-In addition to the benchmarks used by previous works, we introduce new benchmarks on three datasets: PASCAL VOC, COCO, and LVIS. We sample multiple groups of few-shot training examples for multiple runs of the experiments and report evaluation results on both the base classes and the novel classes. These are described in more detail in [Data Preparation](#data-preparation).
+**In addition to the benchmarks used by previous works, we introduce new benchmarks on three datasets: PASCAL VOC, COCO, and LVIS. We sample multiple groups of few-shot training examples for multiple runs of the experiments and report evaluation results on both the base classes and the novel classes.** These are described in more detail in [Data Preparation](#data-preparation).
 
 We also provide benchmark results and pre-trained models for our two-stage fine-tuning approach (TFA). In TFA, we first train the entire object detector on the data-abundant base classes, and then only fine-tune the last layers of the detector on a small balanced training set. See [Models](#models) for our provided models and [Getting Started](#getting-started) for instructions on training and evaluation.
 
@@ -86,29 +86,43 @@ python3 -m pip install -r requirements.txt
 ```
 
 ## Code Structure
-- **configs**: Configuration files
-- **datasets**: Dataset files (see [Data Preparation](#data-preparation) for more details)
+- **configs**: Configuration files # 关于3个数据集和网络结构的config文件
+- **datasets**: Dataset files (see [Data Preparation](#data-preparation) for more details) # 用于准备（预处理）数据集的相关代码
 - **fsdet**
-  - **checkpoint**: Checkpoint code.
-  - **config**: Configuration code and default configurations.
-  - **engine**: Contains training and evaluation loops and hooks.
-  - **layers**: Implementations of different layers used in models.
-  - **modeling**: Code for models, including backbones, proposal networks, and prediction heads.
+  - **checkpoint**: Checkpoint code. # 基于detectron2实现生成checkpoint
+  - **config**: Configuration code and default configurations. # 
+  - **data**: 用于读取、处理数据集的相关代码
+  - **engine**: Contains training and evaluation loops and hooks. # 用于训练、评估的相关代码（循环和hook）
+  - **evaluation**: 用于评估模型的相关代码
+  - **model_zoo**: 已训练好的模型的config文件路径和权重文件路径（下载链接）
+  - **modeling**: Code for models, including backbones, proposal networks, and prediction heads. # 模型实现
+  - **utils**: 下载网上文件的相关代码
 - **tools**
-  - **train_net.py**: Training script.
-  - **test_net.py**: Testing script.
-  - **ckpt_surgery.py**: Surgery on checkpoints.
+  - **aggregate_seeds.py**: Aggregating results from many seeds. # 汇总来自多个seed的结果的相关代码
+  - **ckpt_surgery.py**: Surgery on checkpoints. # 处理checkpoint文件的相关代码
   - **run_experiments.py**: Running experiments across many seeds.
-  - **aggregate_seeds.py**: Aggregating results from many seeds.
+  - **test_net.py**: Testing script. # 测试脚本
+  - **train_net.py**: Training script. # 训练脚本
+  - **visualize_data.py**: 用于数据可视化的相关代码
+  - **visualize_json_results.py**: 用于json文件可视化的相关代码
 
 
 ## Data Preparation
+
+我们在3个数据集上评估模型，详见[datasets/README.md](datasets/README.md)
+- VOC：使用2007、2012的train set和val set作为训练集，使用2007的test set作为测试集。随机将20个classes分为15个base classes和5个novel classes，并且有3种split（详见[fsdet/data/builtin_meta.py](fsdet/data/builtin_meta.py)）
+- COCO：使用COCO2014，其中val set中的5k张图片作为测试集，剩下的图片作为训练集。80=60+20(VOC)
+- LVIS：我们将frequent classes和common classes作为base classes，将rare classes作为novel classes
+
+
 We evaluate our models on three datasets:
 - [PASCAL VOC](http://host.robots.ox.ac.uk/pascal/VOC/): We use the train/val sets of PASCAL VOC 2007+2012 for training and the test set of PASCAL VOC 2007 for evaluation. We randomly split the 20 object classes into 15 base classes and 5 novel classes, and we consider 3 random splits. The splits can be found in [fsdet/data/builtin_meta.py](fsdet/data/builtin_meta.py).
 - [COCO](http://cocodataset.org/): We use COCO 2014 and extract 5k images from the val set for evaluation and use the rest for training. We use the 20 object classes that are the same with PASCAL VOC as novel classes and use the rest as base classes.
 - [LVIS](https://www.lvisdataset.org/): We treat the frequent and common classes as the base classes and the rare categories as the novel classes.
 
 See [datasets/README.md](datasets/README.md) for more details.
+
+如果想自定义构建数据集，可以查看[CUSTOM.md](docs/CUSTOM.md)
 
 If you would like to use your own custom dataset, see [CUSTOM.md](docs/CUSTOM.md) for instructions. If you would like to contribute your custom dataset to our codebase, feel free to open a PR.
 
@@ -161,11 +175,15 @@ For more detailed instructions on the training procedure of TFA, see [TRAIN_INST
 
 For ease of training and evaluation over multiple runs, we provided several helpful scripts in `tools/`.
 
+在VOC第1个split上进行所有shot、所有seed的训练和评估
+
 You can use `tools/run_experiments.py` to do the training and evaluation. For example, to experiment on 30 seeds of the first split of PascalVOC on all shots, run
 ```angular2html
 python3 -m tools.run_experiments --num-gpus 8 \
         --shots 1 2 3 5 10 --seeds 0 30 --split 1
 ```
+
+在训练和评估之和，可以汇总所有seed的结果
 
 After training and evaluation, you can use `tools/aggregate_seeds.py` to aggregate the results over all the seeds to obtain one set of numbers. To aggregate the 3-shot results of the above command, run
 ```angular2html

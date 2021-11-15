@@ -246,6 +246,7 @@ COCO_NOVEL_CATEGORIES = [
 ]
 
 # PASCAL VOC categories
+# 3种split，都是20个class但顺序不同，其中前15个是base classes、后5个是novel classes
 PASCAL_VOC_ALL_CATEGORIES = {
     1: [
         "aeroplane",
@@ -315,12 +316,14 @@ PASCAL_VOC_ALL_CATEGORIES = {
     ],
 }
 
+# Novel VOC categories
 PASCAL_VOC_NOVEL_CATEGORIES = {
     1: ["bird", "bus", "cow", "motorbike", "sofa"],
     2: ["aeroplane", "bottle", "cow", "horse", "sofa"],
     3: ["boat", "cat", "motorbike", "sheep", "sofa"],
 }
 
+# Base VOC categories
 PASCAL_VOC_BASE_CATEGORIES = {
     1: [
         "aeroplane",

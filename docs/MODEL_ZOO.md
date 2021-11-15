@@ -1,6 +1,8 @@
 # Model Zoo and Baselines
 
-We provide a set of benchmark results and pre-trained models available for download. On PASCAL VOC and COCO, we provide results for seed 0, which are consistent with results from previous works. We also provide results over multiple seeds.
+在VOC和COCO上，我们提供了基于seed 0（即FSRW的few-shot dataset）的结果，也提供了基于多组seed的结果。
+
+We provide a set of benchmark results and pre-trained models available for download. **On PASCAL VOC and COCO, we provide results for seed 0, which are consistent with results from previous works. We also provide results over multiple seeds.**
 
 #### Available Models
 

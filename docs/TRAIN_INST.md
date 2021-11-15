@@ -1,10 +1,16 @@
 # TFA Training Instructions
 
+TFA的训练包括2个stage。
+1. Base Training：第1个stage在base classes上训练整个detector
+2. Fine-Tuning：第2个stage在few-shot dataset上finetunedetector的最后1个layer
+
 TFA is trained in two stages. We first train the entire object detector on the data-abundant base classes, and then only fine-tune the last layers of the detector on a small balanced training set. We provide detailed instructions for each stage.
 
 ![TFA Figure](https://user-images.githubusercontent.com/7898443/76520006-698cc200-6438-11ea-864f-fd30b3d50cea.png)
 
 ## Stage 1: Base Training
+
+在VOC的第1个split上训练1个base model，运行以下命令
 
 First train a base model. To train a base model on the first split of PASCAL VOC, run
 ```angular2html

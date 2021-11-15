@@ -53,57 +53,69 @@ __all__ = [
 def default_argument_parser():
     """
     Create a parser with some common arguments used by FsDet users.
+    创造1个包含共同使用的参数的parser
 
     Returns:
         argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(description="FsDet Training")
+    # config文件的路径
     parser.add_argument(
         "--config-file",
         default="",
         metavar="FILE",
         help="path to config file",
     )
+    # 是否从checkpoint开始训练
     parser.add_argument(
         "--resume",
         action="store_true",
         help="whether to attempt to resume from the checkpoint directory",
     )
+    # 是否只评估最后1个checkpoint
     parser.add_argument(
         "--eval-only", action="store_true", help="evaluate last checkpoint"
     )
+    # 是否只评估所有checkpoint
     parser.add_argument(
         "--eval-all",
         action="store_true",
         help="evaluate all saved checkpoints",
     )
+    # 在训练的时候是否评估
     parser.add_argument(
         "--eval-during-train",
         action="store_true",
         help="evaluate during training",
     )
+    # TODO：
     parser.add_argument(
         "--eval-iter",
         type=int,
         default=-1,
         help="checkpoint iteration for evaluation",
     )
+    # TODO：
     parser.add_argument(
         "--start-iter",
         type=int,
         default=-1,
         help="starting iteration for evaluation",
     )
+    # TODO：
     parser.add_argument(
         "--end-iter",
         type=int,
         default=-1,
         help="ending iteration for evaluation",
     )
+    # 每个机器上gpu的数量
     parser.add_argument(
         "--num-gpus", type=int, default=1, help="number of gpus *per machine*"
     )
+    # 机器的数量
     parser.add_argument("--num-machines", type=int, default=1)
+    # 机器的rank
     parser.add_argument(
         "--machine-rank",
         type=int,
@@ -115,9 +127,11 @@ def default_argument_parser():
     # Therefore we use a deterministic way to obtain port,
     # so that users are aware of orphan processes by seeing the port occupied.
     port = 2 ** 15 + 2 ** 14 + hash(os.getuid()) % 2 ** 14
+    # 分布式训练的url
     parser.add_argument(
         "--dist-url", default="tcp://127.0.0.1:{}".format(port)
     )
+    # 通过命令行参数修改config
     parser.add_argument(
         "--opts",
         help="Modify config options using the command-line",
@@ -130,6 +144,10 @@ def default_argument_parser():
 def default_setup(cfg, args):
     """
     Perform some basic common setups at the beginning of a job, including:
+
+    1. 设置logger
+    2. 输出基本环境信息、命令行参数和config
+    3. 备份config到输出文件夹
 
     1. Set up the FsDet logger
     2. Log basic information about environment, cmdline arguments, and config

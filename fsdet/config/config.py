@@ -70,6 +70,8 @@ global_cfg = CfgNode()
 def get_cfg() -> CfgNode:
     """
     Get a copy of the default config.
+    返回FsDet的默认config的拷贝
+
     Returns:
         a fsdet CfgNode instance.
     """
@@ -81,6 +83,8 @@ def get_cfg() -> CfgNode:
 def set_global_cfg(cfg: CfgNode) -> None:
     """
     Let the global config point to the given cfg.
+    使global_cfg指向给定的config，这样在任何地方都可以使用该config
+
     Assume that the given "cfg" has the key "KEY", after calling
     `set_global_cfg(cfg)`, the key can be accessed by:
     .. code-block:: python
