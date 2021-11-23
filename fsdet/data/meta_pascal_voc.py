@@ -91,6 +91,7 @@ def load_filtered_voc_instances(
                     r["annotations"] = instances
                     dicts_.append(r)
             if len(dicts_) > int(shot):
+                # IMPORTANT：如果某个class包含多于k个instance，则随机采样K个instance
                 dicts_ = np.random.choice(dicts_, int(shot), replace=False)
             dicts.extend(dicts_)
     else:
